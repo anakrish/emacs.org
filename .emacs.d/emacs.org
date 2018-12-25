@@ -1,0 +1,107 @@
+
+
+
+
+** MELPA
+Setup MELPA as described at https://melpa.org/#/getting-started.
+#+begin_src emacs-lisp
+    (require 'package)
+    (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+			(not (gnutls-available-p))))
+	   (proto (if no-ssl "http" "https")))
+      (when no-ssl
+	(warn "\
+    Your version of Emacs does not support SSL connections,
+    which is unsafe because it allows man-in-the-middle attacks.
+    There are two things you can do about this warning:
+    1. Install an Emacs version that does support SSL and be safe.
+    2. Remove this warning from your init file so you won't see it again."))
+      ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
+      (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
+      ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
+      (when (< emacs-major-version 24)
+	;; For important compatibility libraries like cl-lib
+	(add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
+    (package-initialize)
+#+end_src
+
+
+** Install Packages
+Install necessary packages first. Then call package-initialize.
+#+begin_src emacs-lisp
+    ;; Is there a way to do the installation only once?
+    ;; package-install seems to be smart and does not seem to re-install.
+    (package-install 'solarized-theme)
+    (package-install 'company)
+    ;; (package-install 'irony)
+
+    ;; Packages used by cmake-ide
+    ;; See https://github.com/atilaneves/cmake-ide 
+    ;; Do we need  irony?
+    (package-install 'flycheck)
+    (package-install 'auto-complete-clang)
+    (package-install 'rtags) ;; For jump to definition. Intall rtags separately
+    (package-install 'cmake-ide)
+
+    ;; For things to work, package-initialize must be called earlier than here
+    ;; Why???
+    ;; (package-initialize)
+#+end_src
+
+
+** Theme: Solarized-dark
+
+#+begin_src emacs-lisp
+   (load-theme 'solarized-dark)
+#+end_src
+   
+
+** Company  (global)
+ 
+#+begin_src emacs-lisp
+   ;; Enable company in all buffers
+   (add-hook 'after-init-hook 'global-company-mode)
+#+end_src
+
+
+** Disabled Irony (C/C++)
+#+begin_src emacs-lisp
+   ;; (add-hook 'c++-mode-hook 'irony-mode)
+   ;; (add-hook 'c-mode-hook 'irony-mode)
+   ;; (add-hook 'objc-mode-hook 'irony-mode)
+   ;; Is the following needed?
+   ;; (eval-after-load 'company
+   ;;       '(add-to-list 'company-backends 'company-irony))
+#+end_src
+
+
+** Flycheck
+#+begin_src emacs-lisp
+    (add-hook 'after-init-hook #'global-flycheck-mode)
+#+end_src
+
+
+** cmake-ide
+#+begin_src emacs-lisp
+    (require 'cmake-ide)
+    (cmake-ide-setup)
+
+    ;; Expect emacs to be opened in root folder of a project.
+    (setq cmake-ide-build-dir "./build")
+    (setq cmake-ide-project-dir ".")
+
+    ;; Does not seem to work.
+    ;; (setq cmake-ide-cmake-args " -DUSE_LIBSGX=1 -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .. ")
+
+    ;; Launch rtags server
+    (rtags-start-process-unless-running)
+
+    ;; Try running cmake and start the server
+    ;;(add-hook 'after-init-hook #'cmake-ide-maybe-start-rdm)
+    ;;(add-hook 'after-init-hook #'cmake-ide-maybe-run-cmake)
+#+end_src
+
+
+
+
+
