@@ -1,8 +1,31 @@
-;; anakrish's emacs setup
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("ec5f697561eaf87b1d3b087dd28e61a2fc9860e4c862ea8e6b0b77bd4967d0ba" default)))
+ '(package-selected-packages
+   (quote
+    (cmake-mode magit ace-jump-mode planet-theme solarized-theme atom-one-dark-theme atom-dark-theme lsp-ui flycheck company-lsp company cquery lsp-mode zenburn-theme))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 
 (require 'org)
 
-;; MELPA
+;; Load customizations.
+;; Note: Themest be marked safe (above) before loading so that
+;; there is no prompt each time emacs is run.
+;;(org-babel-load-file
+;; (expand-file-name "emacs.org" user-emacs-directory))
+
 (require 'package)
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
 		    (not (gnutls-available-p))))
@@ -22,67 +45,63 @@
     (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
 (package-initialize)
 
-;; disable window split
-(setq split-height-threshold 2000)
-(setq split-width-threshold 2000)
-
-;; themes
+;; Themes
 (package-install 'zenburn-theme)
-(package-install 'atom-dark-theme)
-(package-install 'atom-one-dark-theme)
-;;(package-install 'solarized-dark-theme)
-(load-theme 'zenburn t)
-
+(load-theme 'zenburn)
 
 ;; lsp
 (package-install 'lsp-mode)
 (require 'lsp-mode)
 (add-hook 'c-mode-hook #'lsp)
 (add-hook 'cxx-mode-hook #'lsp)
+;;(setq lsp-prefer-flymake nil)
 
 ;; lsp-ui
 (package-install 'lsp-ui)
 (require 'lsp-ui)
 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
 
-;; cquery
-(package-install 'cquery)
-(require 'cquery)
-(setq cquery-executable "~/install/cquery/bin/cquery")
-
 ;; company
 (package-install 'company)
 (require 'company)
 (add-hook 'after-init-hook 'global-company-mode)
+
+;; company-lsp
+(package-install 'company-lsp)
+(require 'company-lsp)
 
 ;; flycheck
 (package-install 'flycheck)
 (require 'flycheck)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
-;; keyboard shortcuts
-;; use xref bindings instead.
-;; M-x describe-bindings
-;;(defun my-c-mode-shortcuts ()
-;;  (interactive)
-;;  ;;(local-set-key (kbd "C-f") 'lsp-find-definition) ;; M-. already does this.
-;;  (local-set-key (kbd "C-r") 'lsp-find-references))
+;; cquery
+(package-install 'cquery)
+(require 'cquery)
+(setq cquery-executable "/home/anakrish/work/cquery/install/bin/cquery")
 
-;;(add-hook 'c-mode-hook #'my-c-mode-shortcuts)
-;;(add-hook 'cxx-mode-hook #'my-c-mode-shortcuts)
+;; ace-jump-mode
+;; Use C-c SPC 
+(package-install 'ace-jump-mode)
+(require 'ace-jump-mode)
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+ 
+;; windmove
+;; Shift + arrow-key
+(global-set-key (kbd "C-c <up>") 'windmove-up)
+(global-set-key (kbd "C-c <down>") 'windmove-down)
+(global-set-key (kbd "C-c <right>") 'windmove-right)
+(global-set-key (kbd "C-c <left>") 'windmove-left)
+
+;; cmake-mode
+(package-install 'cmake-mode)
+(setq load-path (cons (expand-file-name "/dir/with/cmake-mode") load-path))
+(require 'cmake-mode)
 
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (company lsp-mode zygospore zenburn-theme yasnippet xterm-color ws-butler w3 volatile-highlights use-package undo-tree theme-changer spacemacs-theme soothe-theme solarized-theme rtags pos-tip planet-theme pdf-tools omtose-phellack-theme noctilux-theme monokai-theme molokai-theme magit lsp-ui lsp-clangd iedit helm-swoop helm-projectile helm-gtags gruvbox-theme gotham-theme flycheck dtrt-indent darktooth-theme cycle-themes cquery company-lsp comment-dwim-2 color-theme-solarized cmake-mode cmake-ide clean-aindent-mode badger-theme auto-complete-clang atom-one-dark-theme atom-dark-theme anzu ample-theme afternoon-theme))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; column-number-mode
+(setq column-number-mode t)
+
+;; magit
+;; (package-install 'magit)
+
