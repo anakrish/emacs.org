@@ -1,4 +1,4 @@
-
+;; Anand Krishnamoorthi's emacs setup
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -7,10 +7,10 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("ec5f697561eaf87b1d3b087dd28e61a2fc9860e4c862ea8e6b0b77bd4967d0ba" default)))
+    ("bd7b7c5df1174796deefce5debc2d976b264585d51852c962362be83932873d9" "adf5275cc3264f0a938d97ded007c82913906fc6cd64458eaae6853f6be287ce" "2642a1b7f53b9bb34c7f1e032d2098c852811ec2881eec2dc8cc07be004e45a0" "ec5f697561eaf87b1d3b087dd28e61a2fc9860e4c862ea8e6b0b77bd4967d0ba" default)))
  '(package-selected-packages
    (quote
-    (cmake-mode magit ace-jump-mode planet-theme solarized-theme atom-one-dark-theme atom-dark-theme lsp-ui flycheck company-lsp company cquery lsp-mode zenburn-theme))))
+    (counsel smart-mode-line-atom-one-dark-theme smart-mode-line ace-window beacon powerline markdown-preview-eww monokai-theme cmake-mode magit ace-jump-mode planet-theme solarized-theme atom-one-dark-theme atom-dark-theme lsp-ui flycheck company-lsp company cquery lsp-mode zenburn-theme))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -45,16 +45,24 @@
     (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
 (package-initialize)
 
+;; fix color names
+(load-file "~/.emacs.d/color-names.el")
+
+;; apply putty fixes
+(load-file "~/.emacs.d/putty.el")
+
 ;; Themes
 (package-install 'zenburn-theme)
+(package-install 'atom-dark-theme)
+(package-install 'atom-one-dark-theme)
 (load-theme 'zenburn)
 
 ;; lsp
 (package-install 'lsp-mode)
 (require 'lsp-mode)
 (add-hook 'c-mode-hook #'lsp)
-(add-hook 'cxx-mode-hook #'lsp)
-;;(setq lsp-prefer-flymake nil)
+(add-hook 'c++-mode-hook #'lsp)
+(setq lsp-prefer-flymake nil)
 
 ;; lsp-ui
 (package-install 'lsp-ui)
@@ -88,20 +96,84 @@
  
 ;; windmove
 ;; Shift + arrow-key
-(global-set-key (kbd "C-c <up>") 'windmove-up)
-(global-set-key (kbd "C-c <down>") 'windmove-down)
-(global-set-key (kbd "C-c <right>") 'windmove-right)
-(global-set-key (kbd "C-c <left>") 'windmove-left)
+(windmove-default-keybindings)
+
+
+;; ace-window
+;; M-o
+(package-install 'ace-window)
+(require 'ace-window)
+(global-set-key (kbd "M-o") 'ace-window)
+
+
+;; power-line
+(require 'powerline)
+(powerline-default-theme)
+
+;; beacon-mode
+(package-install 'beacon)
+(require 'beacon)
+(beacon-mode 1)
 
 ;; cmake-mode
 (package-install 'cmake-mode)
-(setq load-path (cons (expand-file-name "/dir/with/cmake-mode") load-path))
 (require 'cmake-mode)
 
 
 ;; column-number-mode
 (setq column-number-mode t)
 
+;; tool-bar-mode and menu-bar-mode off
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+
+;; window split thresholds
+(setq split-height-threshold 2160)
+(setq split-width-threshold 3840)
+
+;; winner-mode
+(winner-mode)
+
+
+;; ivy and counsel
+(package-install counsel)
+(require 'ivy)
+(require 'counsel)
+(ivy-mode)
+(counsel-mode)
+(define-key global-map (kbd "C-c f") 'counsel-git)
+
+
+;; named frames
+(defun make-named-frame (name)
+  "Make a frame with a given name"
+  (interactive "sEnter frame name: ")
+  (select-frame
+   (make-frame (cons (cons 'name name) ()))))
+
+(define-key global-map (kbd "C-x 5 2") 'make-named-frame)
+(define-key global-map (kbd "C-z") 'other-frame)
+
+
+;; Setup gdb layout
+(defadvice gdb-setup-windows (around setup-more-gdb-windows activate)
+  ad-do-it
+  (other-window 2)
+  (set-window-dedicated-p (selected-window) nil)
+  (split-window-horizontally)
+  (other-window 1)
+  (gdb-set-window-buffer
+   (gdb-get-buffer-create 'gdb-disassembly-buffer))
+  (other-window 1)
+  (set-window-dedicated-p (selected-window) nil)
+  ;;(split-window-horizontally)
+  ;;(gdb-set-window-buffer
+  ;; (gdb-get-buffer-create 'gdb-registers-buffer))
+  (other-window 3))
+
+
+
+
 ;; magit
-;; (package-install 'magit)
+(package-install 'magit)
 
