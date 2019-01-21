@@ -1,192 +1,111 @@
-;; Anand Krishnamoorthi's emacs setup
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "8ffdc8c66ceeaf7921f4510a70d808f01b303e6b4d177c947b442e80d4228678" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "bd7b7c5df1174796deefce5debc2d976b264585d51852c962362be83932873d9" "adf5275cc3264f0a938d97ded007c82913906fc6cd64458eaae6853f6be287ce" "2642a1b7f53b9bb34c7f1e032d2098c852811ec2881eec2dc8cc07be004e45a0" "ec5f697561eaf87b1d3b087dd28e61a2fc9860e4c862ea8e6b0b77bd4967d0ba" default)))
- '(package-selected-packages
-   (quote
-    (tuareg caml merlin counsel smart-mode-line-atom-one-dark-theme smart-mode-line ace-window beacon powerline markdown-preview-eww monokai-theme cmake-mode magit ace-jump-mode planet-theme solarized-theme atom-one-dark-theme atom-dark-theme lsp-ui flycheck company-lsp company cquery lsp-mode zenburn-theme))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; Anand Krishnamoorthi's emacs setup.
 
-(require 'org)
+(setq load-prefer-newer t)
 
-;; Load customizations.
-;; Note: Themest be marked safe (above) before loading so that
-;; there is no prompt each time emacs is run.
-;;(org-babel-load-file
-;; (expand-file-name "emacs.org" user-emacs-directory))
+;; Setup up MELPA.
+;; Load emacs 24's package system. Add MELPA repository.
+(when (>= emacs-major-version 24)
+  (require 'package)
+  (add-to-list
+   'package-archives
+   '("melpa" . "http://melpa.milkbox.net/packages/")
+   t))
 
-(require 'package)
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-		    (not (gnutls-available-p))))
-       (proto (if no-ssl "http" "https")))
-  (when no-ssl
-    (warn "\
-    Your version of Emacs does not support SSL connections,
-    which is unsafe because it allows man-in-the-middle attacks.
-    There are two things you can do about this warning:
-    1. Install an Emacs version that does support SSL and be safe.
-    2. Remove this warning from your init file so you won't see it again."))
-  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
-  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
-  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
-  (when (< emacs-major-version 24)
-    ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
 (package-initialize)
 
-
+;; backup to this folder rather than littering all
+;; visited directories
 ;; backup folder
 (setq backup-directory-alist
       `(("." . ,(concat user-emacs-directory "backups"))))
 
-;; fix color names
-(load-file "~/.emacs.d/color-names.el")
+;; fixes for use via putty
+(load-file (concat user-emacs-directory "putty.el"))
+(load-file (concat user-emacs-directory "color-names.el"))
 
-;; apply putty fixes
-(load-file "~/.emacs.d/putty.el")
+;; Show column-numbers in all buffers
+(column-number-mode 1)
 
-;; desktop
-;;(desktop-save-mode)
-;;(desktop-auto-save)
-
-;; Fix frame loading in -nw mode
-(setq desktop-restore-forces-onscreen nil)
-(add-hook 'desktop-after-read-hook
- (lambda ()
-   (frameset-restore
-    desktop-saved-frameset
-    :reuse-frames (eq desktop-restore-reuses-frames t)
-    :cleanup-frames (not (eq desktop-restore-reuses-frames 'keep))
-    :force-display desktop-restore-in-current-display
-    :force-onscreen desktop-restore-forces-onscreen)))
-
-;; Themes
-(package-install 'zenburn-theme)
-(package-install 'atom-dark-theme)
-(package-install 'atom-one-dark-theme)
-(load-theme 'atom-one-dark)
-
-;; lsp
-(package-install 'lsp-mode)
-(require 'lsp-mode)
-(add-hook 'c-mode-hook #'lsp)
-(add-hook 'c++-mode-hook #'lsp)
-(setq lsp-prefer-flymake nil)
-
-(defun my-lsp-mode-keys ()
-  "Bind keys to lsp-functions."
-  (define-key (current-local-map) (kbd "M-?") 'lsp-find-references))
-(add-hook 'lsp-mode-hook 'my-lsp-mode-keys)
-
-;; lsp-ui
-(package-install 'lsp-ui)
-(require 'lsp-ui)
-(add-hook 'lsp-mode-hook 'lsp-ui-mode)
-
-;; company
-(package-install 'company)
-(require 'company)
-(add-hook 'after-init-hook 'global-company-mode)
-
-;; company-lsp
-(package-install 'company-lsp)
-(require 'company-lsp)
-
-;; flycheck
-(package-install 'flycheck)
-(require 'flycheck)
-(add-hook 'after-init-hook #'global-flycheck-mode)
-
-;; cquery
-(package-install 'cquery)
-(require 'cquery)
-(setq cquery-executable "/home/anakrish/work/cquery/install/bin/cquery")
-(setq cquery-cache-dir-function 'cquery-cache-dir-consolidated)
-
-;; ace-jump-mode
-;; Use C-c SPC 
-(package-install 'ace-jump-mode)
-(require 'ace-jump-mode)
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-(define-key global-map (kbd "C-c l") 'ace-jump-line-mode)
-
-;; windmove
-;; Shift + arrow-key
-(windmove-default-keybindings)
-
-
-;; ace-window
-;; M-o
-(package-install 'ace-window)
-(require 'ace-window)
-(global-set-key (kbd "M-o") 'ace-window)
-
-
-;; power-line
-;;(require 'powerline)
-;;(powerline-default-theme)
-
-;; beacon-mode
-(package-install 'beacon)
-(require 'beacon)
-(beacon-mode 1)
-
-;; cmake-mode
-(package-install 'cmake-mode)
-(require 'cmake-mode)
-
-
-;; column-number-mode
-(setq column-number-mode t)
-
-;; tool-bar-mode and menu-bar-mode off
+;; Hide menu bar and tool bar
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 
-;; window split thresholds
-(setq split-height-threshold 2160)
-(setq split-width-threshold 3840)
+;; In 4K monitors, avoid creating many windows
+;; by setting large threshold values.
+(setq
+ split-height-threshold 2160
+ split-width-threshold 3840)
 
-;; winner-mode
-(winner-mode)
+;; use-package.
+;; If use-package is not yet installed,
+;; refresh list of packages (MELPA has already been added)
+;; and then install use-package.
+(unless
+    (require 'use-package nil 'no-error)
+  (progn
+    (package-refresh-contents)
+    (package-install 'use-package)))
 
+;; Install all packages
+(setq use-package-always-ensure t)
 
-;; ivy and counsel
-(package-install 'counsel)
-(require 'ivy)
-(require 'counsel)
-(ivy-mode)
-(counsel-mode)
-(define-key global-map (kbd "C-c f") 'counsel-git)
+;; Navigation between windows
+(use-package windmove
+  ;; Shift + arrow keys to navigate windows
+  :config (windmove-default-keybindings))
 
+;; Numbered naviation between windows
+(use-package ace-window
+  :bind (("M-o" . ace-window)))
+  
+;; ace-jump-mode
+(use-package ace-jump-mode
+  :bind (("C-c c" . ace-jump-char-mode)
+	 ("C-c v" . ace-jump-word-mode)
+	 ("C-c l" . ace-jump-line-mode)))
 
-;; named frames
-(defun make-named-frame (name)
-  "Make a frame with a given name"
-  (interactive "sEnter frame name: ")
-  (select-frame
-   (make-frame (cons (cons 'name name) ()))))
+;; When cursor jumps to a window, show a beacon
+;; as a visual aid.
+(use-package beacon
+  :config (beacon-mode 1))
 
-(define-key global-map (kbd "C-x 5 2") 'make-named-frame)
-(define-key global-map (kbd "C-z") 'other-frame)
+;; Ivy and counsel for enhanced command-completion
+;; help etc.
+(use-package ivy
+  :config (ivy-mode))
 
+;; counsel enhances default emacs functions by rebinding them
+;; to counsel- implementations
+(use-package counsel
+  :after ivy
+  ;; Don't defer loading ivy; otherwise it will be loaded
+  ;; only when the key binding is pressed.
+  :demand
+  ;; Ability to search for files in the current repository
+  :bind ("C-c f" . counsel-git)
+  :config (counsel-mode))
 
-;; eshell visual commands
+;; git
+(use-package magit)
+
+;; Choose atom-one-dark-theme.
+;; Theme is chosen late after load-theme has been
+;; rebound to counsel-load-theme
+(use-package atom-one-dark-theme)
+
+;; eshell
+;; Commands specified in visual commands launch a terminal  to execute
 (setq eshell-visual-commands
       '("gdb" "bash"))
 
+;; Configure gdb
+;; gdb-many-windows by default
 ;; Setup gdb layout
+(setq
+ gdb-many-windows t
+ gdb-show-main t)
+
 (defadvice gdb-setup-windows (around setup-more-gdb-windows activate)
   ad-do-it
   (other-window 2)
@@ -203,27 +122,60 @@
   ;; (gdb-get-buffer-create 'gdb-registers-buffer))
   (other-window 4))
 
+;; lsp-mode
+;; Enable lsp-mode in C and C++ buffers.
+;; Disable flymake; use flycheck instead.
+(use-package lsp-mode
+  :demand
+  :init (setq lsp-prefer-flymake nil)
+  ;; Turn on lsp which starts the LSP server (cquery) as well.
+  :hook (c-mode-common . lsp)
+  ;; xref-find-references does not work correctly.
+  ;; rebind to lsp-find-references
+  :bind ("M-?" . lsp-find-references))
 
-;; merlin
-(let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
- (when (and opam-share (file-directory-p opam-share))
-  (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))
-  (autoload 'merlin-mode "merlin" nil t nil)
-  (add-hook 'tuareg-mode-hook 'merlin-mode t)
-  (add-hook 'caml-mode-hook 'merlin-mode t)))
+;; lsp-ui
+;; enable ui integration in all LSP buffers
+(use-package lsp-ui
+  :after lsp-mode
+  :hook (lsp-mode . lsp-ui-mode))
 
-(defun my-merlin-keys ()
-  "Bind xref keys to merlin commands in tuareg mode."
-  (interactive)
-  (define-key (current-local-map) (kbd "M-.") 'merlin-locate)
-  (define-key (current-local-map) (kbd "M-,") 'merlin-pop-stack)
-  (define-key (current-local-map) (kbd "M-?") 'merlin-occurrences))
-    
-(add-hook 'tuareg-mode-hook 'my-merlin-keys)
+;; Enable flycheck globally
+;; flycheck provides error messages in all buffers
+;; by leveraging available backends.
+(use-package flycheck
+  :after lsp-mode
+  :hook (after-init . global-flycheck-mode))
 
-;; magit
-(package-install 'magit)
+;; company
+;; company provides completion in all buffers
+(use-package company
+  :hook (after-init . global-company-mode))
 
-;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
-(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
-;; ## end of OPAM user-setup addition for emacs / base ## keep this line
+;; company-lsp
+;; leverages the LSP mode to provide completions.
+(use-package company-lsp
+  :after lsp-mode)
+
+;; cquery
+;; cquery provides the LSP server for C & C++
+(use-package cquery
+  :after lsp-mode
+  :config (setq
+	   cquery-executable "~/.install/cquery/bin/cquery"
+	   cquery-cache-dir-function 'cquery-cache-dir-consolidated))
+	   
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (company-lsp beacon atom-one-dark-theme use-package))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
