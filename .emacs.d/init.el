@@ -161,9 +161,16 @@
 ;; cquery provides the LSP server for C & C++
 (use-package cquery
   :after lsp-mode
-  :config (setq
-	   cquery-executable "~/.install/cquery/bin/cquery"
-	   cquery-cache-dir-function 'cquery-cache-dir-consolidated))
+  :config
+  (setq
+   cquery-executable "~/.install/cquery/bin/cquery"
+   cquery-cache-dir-function 'cquery-cache-dir-consolidated)
+  (unless (f-file? cquery-executable)
+    (error (concat
+	    "The cquery executable was not found at " cquery-executable ".\n"
+	    "You can safely use emacs; but intellisense for C and C++ files will not be available.\n"
+	    "Build and install cquery following the instructions at https://github.com/cquery-project/cquery/wiki/Building-cquery.\n"
+	    "Then change the value of cquery-executable in your ~/.emacs.d/init.el to point to the installed cquery executable"))))
 	   
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
