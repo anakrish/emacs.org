@@ -21,8 +21,13 @@
       `(("." . ,(concat user-emacs-directory "backups"))))
 
 ;; fixes for use via putty
-(load-file (concat user-emacs-directory "putty.el"))
-(load-file (concat user-emacs-directory "color-names.el"))
+(defun putty-init ()
+  "Fixes for putty-client"
+  (interactive)
+  (load-file (concat user-emacs-directory "putty.el"))
+  (load-file (concat user-emacs-directory "color-names.el")))
+
+(putty-init)
 
 ;; Show column-numbers in all buffers
 (column-number-mode 1)
@@ -70,6 +75,25 @@
 (use-package beacon
   :config (beacon-mode 1))
 
+
+;; workgroups2
+;; This is an old, abandoned package.
+;; Need to roll out an alternative.
+;; group buffers by purpose "code", "debug" etc
+;; C-c z c create new group
+;; C-c z v switch to group
+;; C-c z n switch to next group
+;; C-c z p switch to previous group
+(use-package workgroups2
+  ;; Use a unique file to store workgroup for current emacs instance.
+  ;; This prevents the workgroup data from persisting across multiple emacs
+  ;; sessions.
+  :init (setq wg-session-file (format "/tmp/emacs-workgroup-%d" (emacs-pid)))
+  :config (progn
+	    (workgroups-mode 1)))
+	    ;; Rename the default workgroup
+	    ;; (wg-rename-workgroup "editor")))
+
 ;; Ivy and counsel for enhanced command-completion
 ;; help etc.
 (use-package ivy
@@ -116,11 +140,11 @@
    (gdb-get-buffer-create 'gdb-disassembly-buffer))
   (other-window 1)
   (set-window-dedicated-p (selected-window) nil)
-  (balance-windows-1)
+  (balance-windows-area)
   ;;(split-window-horizontally)
   ;;(gdb-set-window-buffer
   ;; (gdb-get-buffer-create 'gdb-registers-buffer))
-  (other-window 4))
+  (other-window 3))
 
 ;; lsp-mode
 ;; Enable lsp-mode in C and C++ buffers.
@@ -171,18 +195,9 @@
 	    "You can safely use emacs; but intellisense for C and C++ files will not be available.\n"
 	    "Build and install cquery following the instructions at https://github.com/cquery-project/cquery/wiki/Building-cquery.\n"
 	    "Then change the value of cquery-executable in your ~/.emacs.d/init.el to point to the installed cquery executable"))))
-	   
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (company-lsp beacon atom-one-dark-theme use-package))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
+
+;;
+;; Auto-generated code follows
+;;
+
