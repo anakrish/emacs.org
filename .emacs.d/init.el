@@ -22,12 +22,15 @@
 
 ;; fixes for use via putty
 (defun putty-init ()
-  "Fixes for putty-client"
+  "Fixes for putty-client."
   (interactive)
   (load-file (concat user-emacs-directory "putty.el"))
   (load-file (concat user-emacs-directory "color-names.el")))
 
 (putty-init)
+
+;; enable mouse in terminal
+(xterm-mouse-mode)
 
 ;; Show column-numbers in all buffers
 (column-number-mode 1)
@@ -111,7 +114,8 @@
   :config (counsel-mode))
 
 ;; git
-(use-package magit)
+(if (not (string-equal (shell-command-to-string "which git") ""))
+    (use-package magit))
 
 ;; Choose atom-one-dark-theme.
 ;; Theme is chosen late after load-theme has been
@@ -181,23 +185,64 @@
 (use-package company-lsp
   :after lsp-mode)
 
+;; For 'some' function used below
+(use-package cl)
+
 ;; cquery
 ;; cquery provides the LSP server for C & C++
 (use-package cquery
-  :after lsp-mode
+   :after lsp-mode
   :config
   (setq
-   cquery-executable "~/.install/cquery/bin/cquery"
-   cquery-cache-dir-function 'cquery-cache-dir-consolidated)
-  (unless (f-file? cquery-executable)
-    (error (concat
-	    "The cquery executable was not found at " cquery-executable ".\n"
-	    "You can safely use emacs; but intellisense for C and C++ files will not be available.\n"
-	    "Build and install cquery following the instructions at https://github.com/cquery-project/cquery/wiki/Building-cquery.\n"
-	    "Then change the value of cquery-executable in your ~/.emacs.d/init.el to point to the installed cquery executable"))))
+   cquery-executable "~/.tools/cquery/release/bin/cquery"
+   cquery-cache-dir-function 'cquery-cache-dir-consolidated))
 
+(defun my/install-packages ()
+  "Install necessary packages."
+  (let ((progs (list "git" "cmake" cquery-executable "ag"))
+	(prog-exist-p (lambda (p)
+			(string-equal
+			 (shell-command-to-string (concat "which " p))
+			 ""))))
+    (if (some prog-exist-p progs)
+	(progn
+	  (term "/bin/bash")
+	  (switch-to-buffer "*terminal*")
+	  (term-send-string  "*terminal*" "~/.emacs.d/install-packages && exit\n")))))
+
+;; Once initialization is done, proceed to install
+;; packages if needed. This ensures that the terminal
+;; window is correctly focused.
+(add-hook 'emacs-startup-hook 'my/install-packages)
+
+(defun my/set-kill-buffer-sentinel ()
+  "Set the process sentinel to kill buffer when the process exits."
+  (let ((p (get-buffer-process (current-buffer))))
+    (set-process-query-on-exit-flag p nil)
+    (set-process-sentinel p
+			  (lambda (p e)
+			    (kill-buffer (current-buffer))))))
+   
+
+;; Kill window when a terminal, shell or eshell exits.
+(add-hook 'term-exec-hook 'my/set-kill-buffer-sentinel)
+(add-hook 'shell-mode-hook 'my/set-kill-buffer-sentinel)
 
 ;;
 ;; Auto-generated code follows
 ;;
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (cquery company-lsp company flycheck lsp-ui lsp-mode atom-one-dark-theme magit counsel ivy workgroups2 beacon ace-jump-mode ace-window use-package))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

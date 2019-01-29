@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo "+ Installing necessary packages"
+
+set -x
+
+# Install necessary packages
+sudo apt install git cmake silversearcher-ag
+
+
+# Build cquery
+echo "Building cquery"
+rm -rf ~/.tools/cquery
+mkdir -p ~/.tools/cquery
+cd ~/.tools/cquery/
+git clone --recursive https://github.com/cquery-project/cquery.git .
+git submodule update --init
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/.tools/cquery/release
+make -j4
+make install
+exit
