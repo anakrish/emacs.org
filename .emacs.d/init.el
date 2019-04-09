@@ -78,25 +78,6 @@
 (use-package beacon
   :config (beacon-mode 1))
 
-
-;; workgroups2
-;; This is an old, abandoned package.
-;; Need to roll out an alternative.
-;; group buffers by purpose "code", "debug" etc
-;; C-c z c create new group
-;; C-c z v switch to group
-;; C-c z n switch to next group
-;; C-c z p switch to previous group
-(use-package workgroups2
-  ;; Use a unique file to store workgroup for current emacs instance.
-  ;; This prevents the workgroup data from persisting across multiple emacs
-  ;; sessions.
-  :init (setq wg-session-file (format "/tmp/emacs-workgroup-%d" (emacs-pid)))
-  :config (progn
-	    (workgroups-mode 1)))
-	    ;; Rename the default workgroup
-	    ;; (wg-rename-workgroup "editor")))
-
 ;; Ivy and counsel for enhanced command-completion
 ;; help etc.
 (use-package ivy
@@ -120,7 +101,8 @@
 ;; Choose atom-one-dark-theme.
 ;; Theme is chosen late after load-theme has been
 ;; rebound to counsel-load-theme
-(use-package atom-one-dark-theme)
+;; (use-package atom-one-dark-theme)
+
 
 ;; eshell
 ;; Commands specified in visual commands launch a terminal  to execute
@@ -228,6 +210,44 @@
 (add-hook 'term-exec-hook 'my/set-kill-buffer-sentinel)
 (add-hook 'shell-mode-hook 'my/set-kill-buffer-sentinel)
 
+;; Use screen
+(use-package elscreen
+  :config
+  (elscreen-start)
+  (elscreen-toggle-display-tab)
+
+  ;; terminals
+  ;;(ansi-term "/bin/bash")
+  ;;(switch-to-buffer "*ansi-term*")
+  ;;  (local-set-key (kbd "C-z n") 'elscreen-next)
+  (eshell)
+  (elscreen-screen-nickname "terminals")
+
+  ;; editor
+  (elscreen-create)
+  (elscreen-screen-nickname "editor"))
+
+(defvar my/orig-background-color (background-color-at-point))
+
+(defun my/toggle-transparency ()
+  "Toggle transparency."
+  (interactive)
+  (set-background-color "transparent"))
+
+
+;;(use-package color-theme-solarized
+;;   :config
+;;   (load-theme 'solarized-dark 1))
+
+(use-package atom-one-dark-theme)
+
+(toggle-truncate-lines)
+
+(profiler-start 'cpu)
+
+(setq c-default-style "linux"
+      c-basic-offset 4)
+
 ;;
 ;; Auto-generated code follows
 ;;
@@ -237,9 +257,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "abe5ee8858cd1fbe36304a8c3b2315d3e0a4ef7c8588fcc45d1c23eafb725bb6" "8885761700542f5d0ea63436874bf3f9e279211707d4b1ca9ed6f53522f21934" "d057f0430ba54f813a5d60c1d18f28cf97d271fd35a36be478e20924ea9451bd" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d600c677f1777c1e4bfb066529b5b73c0179d0499dd4ffa3f599a0fb0cfbd501" "980db7875457fcefa2af9bcfcd97ca16bd844b0c7eacd9243bcb567a55d8ed21" "36ca8f60565af20ef4f30783aa16a26d96c02df7b4e54e9900a5138fb33808da" "bf5bdab33a008333648512df0d2b9d9710bdfba12f6a768c7d2c438e1092b633" default)))
  '(package-selected-packages
    (quote
-    (cquery company-lsp company flycheck lsp-ui lsp-mode atom-one-dark-theme magit counsel ivy workgroups2 beacon ace-jump-mode ace-window use-package))))
+    (color-theme-solarized color-theme-sanityinc-solarized zenburn-theme solarized-theme omtose-phellack-theme noctilux-theme nimbus-theme ample-theme elscreen cquery company-lsp company flycheck lsp-ui lsp-mode atom-one-dark-theme magit counsel ivy workgroups2 beacon ace-jump-mode ace-window use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
