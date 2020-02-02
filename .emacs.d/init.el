@@ -170,33 +170,6 @@
 ;; For 'some' function used below
 (use-package cl)
 
-;; cquery
-;; cquery provides the LSP server for C & C++
-(use-package cquery
-   :after lsp-mode
-  :config
-  (setq
-   cquery-executable "~/.tools/cquery/release/bin/cquery"
-   cquery-cache-dir-function 'cquery-cache-dir-consolidated))
-
-(defun my/install-packages ()
-  "Install necessary packages."
-  (let ((progs (list "git" "cmake" cquery-executable "ag"))
-	(prog-exist-p (lambda (p)
-			(string-equal
-			 (shell-command-to-string (concat "which " p))
-			 ""))))
-    (if (some prog-exist-p progs)
-	(progn
-	  (term "/bin/bash")
-	  (switch-to-buffer "*terminal*")
-	  (term-send-string  "*terminal*" "~/.emacs.d/install-packages && exit\n")))))
-
-;; Once initialization is done, proceed to install
-;; packages if needed. This ensures that the terminal
-;; window is correctly focused.
-(add-hook 'emacs-startup-hook 'my/install-packages)
-
 (defun my/set-kill-buffer-sentinel ()
   "Set the process sentinel to kill buffer when the process exits."
   (let ((p (get-buffer-process (current-buffer))))
@@ -235,11 +208,11 @@
   (set-background-color "transparent"))
 
 
-;;(use-package color-theme-solarized
-;;   :config
-;;   (load-theme 'solarized-dark 1))
+;;(use-package solarized-theme)
+ 
+;;(use-package atom-one-dark-theme)
 
-(use-package atom-one-dark-theme)
+(use-package zenburn-theme)
 
 (toggle-truncate-lines)
 
@@ -259,7 +232,7 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "abe5ee8858cd1fbe36304a8c3b2315d3e0a4ef7c8588fcc45d1c23eafb725bb6" "8885761700542f5d0ea63436874bf3f9e279211707d4b1ca9ed6f53522f21934" "d057f0430ba54f813a5d60c1d18f28cf97d271fd35a36be478e20924ea9451bd" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d600c677f1777c1e4bfb066529b5b73c0179d0499dd4ffa3f599a0fb0cfbd501" "980db7875457fcefa2af9bcfcd97ca16bd844b0c7eacd9243bcb567a55d8ed21" "36ca8f60565af20ef4f30783aa16a26d96c02df7b4e54e9900a5138fb33808da" "bf5bdab33a008333648512df0d2b9d9710bdfba12f6a768c7d2c438e1092b633" default)))
+    ("f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" "669e02142a56f63861288cc585bee81643ded48a19e36bfdf02b66d745bcc626" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "abe5ee8858cd1fbe36304a8c3b2315d3e0a4ef7c8588fcc45d1c23eafb725bb6" "8885761700542f5d0ea63436874bf3f9e279211707d4b1ca9ed6f53522f21934" "d057f0430ba54f813a5d60c1d18f28cf97d271fd35a36be478e20924ea9451bd" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d600c677f1777c1e4bfb066529b5b73c0179d0499dd4ffa3f599a0fb0cfbd501" "980db7875457fcefa2af9bcfcd97ca16bd844b0c7eacd9243bcb567a55d8ed21" "36ca8f60565af20ef4f30783aa16a26d96c02df7b4e54e9900a5138fb33808da" "bf5bdab33a008333648512df0d2b9d9710bdfba12f6a768c7d2c438e1092b633" default)))
  '(package-selected-packages
    (quote
     (color-theme-solarized color-theme-sanityinc-solarized zenburn-theme solarized-theme omtose-phellack-theme noctilux-theme nimbus-theme ample-theme elscreen cquery company-lsp company flycheck lsp-ui lsp-mode atom-one-dark-theme magit counsel ivy workgroups2 beacon ace-jump-mode ace-window use-package))))
