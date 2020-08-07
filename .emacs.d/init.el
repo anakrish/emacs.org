@@ -9,7 +9,7 @@
   (require 'package)
   (add-to-list
    'package-archives
-   '("melpa" . "http://melpa.milkbox.net/packages/")
+   '("melpa-stable" . "https://melpa.org/packages/")
    t))
 
 (package-initialize)
@@ -36,7 +36,7 @@
 (column-number-mode 1)
 
 ;; Hide menu bar and tool bar
-(tool-bar-mode -1)
+;;(tool-bar-mode -1)
 (menu-bar-mode -1)
 
 ;; In 4K monitors, avoid creating many windows
